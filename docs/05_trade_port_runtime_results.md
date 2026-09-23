@@ -96,6 +96,28 @@ ToPort SeaZone: Bay of Cadiz
 
 The route is maritime. Both endpoint sea zones are valid.
 
+### Lübeck Market -> Brugge Market
+
+Observed debug values:
+
+```text
+FromPort: Lübeck
+FromPort IsCoastal: YES
+FromPort HasPort: YES
+FromPort SeaZone: Bay of Lübeck
+
+ToPort: Brugge
+ToPort IsCoastal: YES
+ToPort HasPort: YES
+ToPort SeaZone: Scheldt Estuary
+```
+
+This case is especially important because Lübeck and Brugge are also connected through continental land geography. The highlighted Trade route nevertheless runs over sea between the two markets. Both endpoint sea zones are valid.
+
+This supports interpreting the classifier as a proxy for the **engine-selected Trade route**, not for whether sea transport is geographically unavoidable.
+
+For the mod design, this is desirable: if the game's route calculation chooses the maritime path because it is cheaper/faster/better, the Trade should consume shipping capacity even when a land alternative exists.
+
 ## Rejected hypothesis: valid endpoint locations alone imply sea transport
 
 The original hypothesis remains rejected:
@@ -111,19 +133,20 @@ The values may represent route transfer/entry/exit nodes or a broader engine rou
 
 ## Current candidate maritime classifier
 
-The second runtime pass produced the following pattern:
+The runtime pass has produced the following pattern:
 
-| Trade | Known route type | From endpoint SeaZone | To endpoint SeaZone | Candidate result |
+| Trade | Observed selected route | From endpoint SeaZone | To endpoint SeaZone | Candidate result |
 |---|---|---:|---:|---:|
 | Brugge -> Paris | overland | invalid | invalid | NO |
 | Paris -> London | maritime | valid | valid | YES |
 | London -> Köln | mixed land/sea | valid | invalid | YES |
 | London -> Sevilla | maritime | valid | valid | YES |
+| Lübeck -> Brugge | maritime despite land alternative | valid | valid | YES |
 
 All tested cases are consistent with the candidate:
 
 ```text
-requires_shipping =
+uses_shipping =
     Trade.GetFromPort.GetPortSeaZone.IsValid
     OR
     Trade.GetToPort.GetPortSeaZone.IsValid
@@ -132,19 +155,42 @@ requires_shipping =
 More defensively, accounting for invalid endpoint objects:
 
 ```text
-requires_shipping =
+uses_shipping =
     (Trade.GetFromPort.IsValid AND Trade.GetFromPort.GetPortSeaZone.IsValid)
     OR
     (Trade.GetToPort.IsValid AND Trade.GetToPort.GetPortSeaZone.IsValid)
 ```
 
+### Semantics
+
+For the mod, the intended meaning should now be:
+
+```text
+uses_shipping =
+    the engine-selected Trade relation uses a maritime leg
+```
+
+not:
+
+```text
+requires_shipping =
+    no land route exists
+```
+
+This distinction matters for relations such as Lübeck -> Brugge, where a land alternative exists but the actual Trade route selected by the engine runs over sea.
+
 ### Status
 
-**Promising runtime hypothesis; not yet verified enough for gameplay logic.**
+**Strong runtime hypothesis; still not yet a verified gameplay-script classifier.**
 
-The next tests should target false positives: routes that are visibly and unambiguously overland even though one or both involved markets are coastal or close to ports. If those routes still produce invalid endpoint sea zones, confidence in this classifier rises substantially.
+The current evidence includes:
 
-High-value examples include continental relations such as Brugge -> Köln or Sevilla -> Madrid, provided the map highlight confirms an overland route.
+- pure overland -> both endpoint SeaZones invalid,
+- pure maritime -> endpoint SeaZones valid,
+- mixed maritime + inland -> one endpoint SeaZone valid,
+- maritime route chosen despite a land alternative -> endpoint SeaZones valid.
+
+The highest-value remaining false-positive test is a relation where one or both markets are coastal, but the highlighted selected Trade route is unambiguously overland. If such a route still produces invalid endpoint sea zones, confidence rises further.
 
 ## GUI side effect observed
 
@@ -168,7 +214,7 @@ A suitable V1 architecture is a route-classification cache keyed by a market rel
 
 ```text
 RouteKey = FromMarket -> ToMarket
-RouteValue = requires_shipping yes/no
+RouteValue = uses_shipping yes/no
 ```
 
 If route ownership or country-specific access proves relevant, the owner/country must also be part of the key.
