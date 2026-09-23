@@ -13,6 +13,7 @@ eu5ts_debug_bridge_maritime = {
 		remove_variable = eu5ts_debug_bridge_trade_scope_ok
 		remove_variable = eu5ts_debug_bridge_from_market_scope_ok
 		remove_variable = eu5ts_debug_bridge_to_market_scope_ok
+		remove_variable = eu5ts_debug_route_cache_write_ok
 
 		set_variable = { name = eu5ts_debug_bridge_ran value = 1 }
 		set_variable = { name = eu5ts_debug_bridge_maritime value = 1 }
@@ -28,6 +29,27 @@ eu5ts_debug_bridge_maritime = {
 		if = {
 			limit = { exists = scope:to_market }
 			set_variable = { name = eu5ts_debug_bridge_to_market_scope_ok value = 1 }
+		}
+
+		# Directed cache: FromMarket -> ToMarket = 1 (uses shipping).
+		# This is intentionally directional until route symmetry is proven.
+		if = {
+			limit = {
+				exists = scope:from_market
+				exists = scope:to_market
+			}
+			scope:from_market = {
+				remove_from_variable_map = {
+					name = eu5ts_shipping_routes
+					key = scope:to_market
+				}
+				add_to_variable_map = {
+					name = eu5ts_shipping_routes
+					key = scope:to_market
+					value = 1
+				}
+			}
+			set_variable = { name = eu5ts_debug_route_cache_write_ok value = 1 }
 		}
 	}
 }
@@ -47,6 +69,7 @@ eu5ts_debug_bridge_land = {
 		remove_variable = eu5ts_debug_bridge_trade_scope_ok
 		remove_variable = eu5ts_debug_bridge_from_market_scope_ok
 		remove_variable = eu5ts_debug_bridge_to_market_scope_ok
+		remove_variable = eu5ts_debug_route_cache_write_ok
 
 		set_variable = { name = eu5ts_debug_bridge_ran value = 1 }
 		set_variable = { name = eu5ts_debug_bridge_land value = 1 }
@@ -62,6 +85,26 @@ eu5ts_debug_bridge_land = {
 		if = {
 			limit = { exists = scope:to_market }
 			set_variable = { name = eu5ts_debug_bridge_to_market_scope_ok value = 1 }
+		}
+
+		# Directed cache: FromMarket -> ToMarket = 0 (overland/no shipping).
+		if = {
+			limit = {
+				exists = scope:from_market
+				exists = scope:to_market
+			}
+			scope:from_market = {
+				remove_from_variable_map = {
+					name = eu5ts_shipping_routes
+					key = scope:to_market
+				}
+				add_to_variable_map = {
+					name = eu5ts_shipping_routes
+					key = scope:to_market
+					value = 0
+				}
+			}
+			set_variable = { name = eu5ts_debug_route_cache_write_ok value = 1 }
 		}
 	}
 }
