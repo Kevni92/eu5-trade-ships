@@ -53,7 +53,7 @@ lateralview = {
 
 			paper_simple_card = {
 				layoutpolicy_horizontal = expanding
-				size = { -1 720 }
+				size = { -1 820 }
 				vbox = {
 					margin = { 12 12 }
 					spacing = 4
@@ -247,7 +247,27 @@ lateralview = {
 					}
 
 					text_single = {
-						raw_text = "#Y Goal: prove GUI Trade.MakeScope can enter a normal scripted-GUI Jomini effect.#!"
+						raw_text = "#Y --- DIRECTED ROUTE CACHE ---#!"
+					}
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_route_cache_write_ok').IsSet]"
+						raw_text = "Jomini cache write attempted: #G YES#!"
+					}
+					text_single = {
+						visible = "[Not(Trade.GetFromMarket.MakeScope.GetVariableFromVariableMap('eu5ts_shipping_routes', Trade.GetToMarket.MakeScope).IsSet)]"
+						raw_text = "Cache readback for this From->To pair: #Y NOT CACHED#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetFromMarket.MakeScope.GetVariableFromVariableMap('eu5ts_shipping_routes', Trade.GetToMarket.MakeScope).IsSet, EqualTo_CFixedPoint(Trade.GetFromMarket.MakeScope.GetVariableFromVariableMap('eu5ts_shipping_routes', Trade.GetToMarket.MakeScope).GetValue, '(CFixedPoint)1'))]"
+						raw_text = "Cache readback for this From->To pair: #G MARITIME (1)#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetFromMarket.MakeScope.GetVariableFromVariableMap('eu5ts_shipping_routes', Trade.GetToMarket.MakeScope).IsSet, EqualTo_CFixedPoint(Trade.GetFromMarket.MakeScope.GetVariableFromVariableMap('eu5ts_shipping_routes', Trade.GetToMarket.MakeScope).GetValue, '(CFixedPoint)0'))]"
+						raw_text = "Cache readback for this From->To pair: #R LAND (0)#!"
+					}
+
+					text_single = {
+						raw_text = "#Y Goal: prove GUI classifier -> Jomini scope bridge -> persistent directed Market-pair cache -> GUI readback.#!"
 						default_format = "#flavor"
 					}
 				}
