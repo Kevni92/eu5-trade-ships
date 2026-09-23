@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This runtime test exists to resolve the remaining uncertainty around using location connectivity as a V1 proxy for maritime trade classification.
+This runtime test exists to resolve whether Location connectivity triggers can be used as a V1 proxy for maritime trade classification.
 
 The engine documentation explicitly describes:
 
@@ -20,7 +20,7 @@ is_connected_to
 
 exists and is used by Vanilla, but its exact routing/ownership semantics are not sufficiently documented for the Trade Ships design.
 
-The mod therefore tests both triggers side by side on fixed geography.
+The test therefore evaluates both triggers side by side on fixed geography.
 
 ## What this test does not test
 
@@ -31,20 +31,18 @@ Trade.GetFromPort
 Trade.GetToPort
 ```
 
-but no equivalent normal gameplay-script Trade target has been verified. This runtime mod does not invent `from_port`, `to_port`, `uses_sea`, or similar syntax. Doing so would turn the test itself into invalid script rather than test runtime behavior.
+but no equivalent normal gameplay-script Trade target has been verified. This runtime mod does not invent `from_port`, `to_port`, `uses_sea`, or similar syntax.
 
-Likewise, this test does not claim that connectivity is identical to the actual route chosen by the trade pathfinder. It only establishes what the two Location connectivity triggers mean in practice.
+Likewise, this test does not claim that connectivity is identical to the actual route chosen by the trade pathfinder. It only establishes what the two Location connectivity triggers return in practice for the tested pairs.
 
 ---
 
 # Test matrix
 
-The event chain runs these cases in order.
-
 | Test | Pair | Purpose |
 |---|---|---|
 | 1 | London -> Oxford | Same-realm land control |
-| 2 | Kobenhavn -> Malmo | Strait-oriented same-realm control |
+| 2 | Kobenhavn -> Malmo | Strait-oriented control |
 | 3 | Paris -> Madrid | International continental land |
 | 4 | Rome -> Naples | Second international continental land control |
 | 5 | London -> Paris | Clear sea separation across the English Channel |
@@ -65,71 +63,92 @@ REALM   = is_connected_to_through_realm
 
 ---
 
-# Working hypothesis
+# Observed runtime results
 
-The current working hypothesis is:
+The test was executed in-game as England. The observed values were:
+
+| Test | Pair | GENERAL | REALM |
+|---|---|---:|---:|
+| 1 | London -> Oxford | YES | YES |
+| 2 | Kobenhavn -> Malmo | NO | NO |
+| 3 | Paris -> Madrid | NO | NO |
+| 4 | Rome -> Naples | NO | NO |
+| 5 | London -> Paris | NO | NO |
+
+Raw report:
 
 ```text
-London -> Oxford     YES / YES
-Kobenhavn -> Malmo   YES / YES
-Paris -> Madrid      YES / NO
-Rome -> Naples       YES / NO
-London -> Paris      NO  / NO
+YES/YES
+NO/NO
+NO/NO
+NO/NO
+NO/NO
 ```
-
-This is deliberately a hypothesis, not a scripted expected answer.
-
-The actual runtime results are authoritative for the installed game build.
 
 ---
 
 # Interpretation
 
-## Pattern A
+## `is_connected_to` is not arbitrary transitive land connectivity
 
-If the international land pairs return:
-
-```text
-GENERAL = YES
-REALM   = NO
-```
-
-while London -> Paris returns:
+The decisive controls are:
 
 ```text
-GENERAL = NO
-REALM   = NO
+Paris -> Madrid = NO
+Rome  -> Naples = NO
 ```
 
-then `is_connected_to` is a viable indicator for broad land/strait connectivity independent of realm ownership.
+Both are continental land pairs, yet `is_connected_to` returns `NO`.
 
-That would make it useful as a **geographic fallback** for V1.
-
-It still would not prove that a real Trade object chose a land route rather than an available sea route.
-
-## Pattern B
-
-If London -> Paris returns:
+Therefore the trigger cannot be interpreted as:
 
 ```text
-GENERAL = YES
+"there exists some land/strait path between these two arbitrary locations"
 ```
 
-then `is_connected_to` clearly crosses ordinary sea separation and cannot be used as a no-sea classifier.
-
-## Pattern C
-
-If Paris -> Madrid and Rome -> Naples return:
+This rules out the proposed V1 classifier:
 
 ```text
-GENERAL = NO
+is_connected_to = yes -> land trade
+is_connected_to = no  -> maritime trade
 ```
 
-then `is_connected_to` is probably ownership/realm constrained or otherwise unsuitable for arbitrary international route classification.
+because it would incorrectly classify continental examples such as Paris -> Madrid and Rome -> Naples as maritime.
 
-## Strait case
+## `is_connected_to_through_realm` remains realm-specific
 
-Kobenhavn -> Malmo is included to check whether the installed build treats this Oresund case as connected under the two triggers.
+The official description of `is_connected_to_through_realm` remains useful for its intended purpose: checking land/strait connectivity inside a realm.
+
+It is not a general international trade-route classifier.
+
+## Kobenhavn -> Malmo
+
+The Kobenhavn -> Malmo control returned `NO/NO`. This should not be generalized into a statement that straits are unsupported globally; it only proves that this exact pair did not return connected in the tested state/build.
+
+## London -> Paris
+
+London -> Paris also returned `NO/NO`, but this is not evidence that `NO` means "requires sea" because the same result occurs for the continental land controls.
+
+---
+
+# Conclusion
+
+The connectivity fallback is rejected for V1.
+
+Status after runtime verification:
+
+```text
+is_connected_to
+    confirmed real trigger
+    not suitable as arbitrary land-path classifier
+
+is_connected_to_through_realm
+    confirmed land/strait semantics
+    explicitly realm-limited
+    not suitable for arbitrary international trade routes
+```
+
+The next research target is the Trade/pathfinding data model itself: route path objects, selected ports, adjacency costs, and any gameplay-script bridge to that information.
 
 ---
 
@@ -151,49 +170,13 @@ eu5-trade-ships/
 │       └── eu5_trade_ships_connectivity_test_events.txt
 ├── main_menu/
 │   └── localization/
-│       └── english/
-│           └── eu5_trade_ships_connectivity_test_l_english.yml
+│       ├── english/
+│       └── german/
 └── docs/
 ```
 
-Place or link the repository folder under:
+Manual console trigger:
 
 ```text
-Documents/Paradox Interactive/Europa Universalis V/mod/
+event eu5_trade_ships_connectivity_test.1
 ```
-
-Enable:
-
-```text
-EU5 Trade Ships - Connectivity Test
-```
-
-in the launcher playset and start a **new game**.
-
-`on_game_start` triggers the test chain for every human country. The test does not modify game state.
-
----
-
-# Reporting results
-
-After the fifth test, report the five pairs in this order:
-
-```text
-London-Oxford:     GENERAL/REALM
-Kobenhavn-Malmo:   GENERAL/REALM
-Paris-Madrid:      GENERAL/REALM
-Rome-Naples:       GENERAL/REALM
-London-Paris:      GENERAL/REALM
-```
-
-Example format only:
-
-```text
-YES/YES
-YES/YES
-YES/NO
-YES/NO
-NO/NO
-```
-
-Once those runtime values are known, `02_technical_feasibility.md` can be updated with an evidence-based conclusion about the connectivity fallback.
