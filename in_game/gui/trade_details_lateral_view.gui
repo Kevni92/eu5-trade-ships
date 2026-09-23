@@ -53,7 +53,7 @@ lateralview = {
 
 			paper_simple_card = {
 				layoutpolicy_horizontal = expanding
-				size = { -1 540 }
+				size = { -1 720 }
 				vbox = {
 					margin = { 12 12 }
 					spacing = 4
@@ -167,7 +167,77 @@ lateralview = {
 					}
 
 					text_single = {
-						raw_text = "#Y Hypothesis: any valid endpoint SeaZone may indicate a maritime leg. Needs false-positive testing.#!"
+						raw_text = "#Y --- GUI -> JOMINI BRIDGE TEST ---#!"
+					}
+
+					button_regular = {
+						size = { 100% 30 }
+						text = "EU5TS_DEBUG_RUN_MARITIME_BRIDGE"
+						visible = "[Or(And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid), And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid))]"
+						action_tooltip = {
+							title = "EU5TS_DEBUG_BRIDGE_TT"
+							on_action = "[GetScriptedGui('eu5ts_debug_bridge_maritime').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).AddScope('trade', Trade.MakeScope).AddScope('from_market', Trade.GetFromMarket.MakeScope).AddScope('to_market', Trade.GetToMarket.MakeScope).End)]"
+						}
+						tooltipwidget = { BasicFunctionalTooltip = {} }
+					}
+
+					button_regular = {
+						size = { 100% 30 }
+						text = "EU5TS_DEBUG_RUN_LAND_BRIDGE"
+						visible = "[Not(Or(And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid), And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid)))]"
+						action_tooltip = {
+							title = "EU5TS_DEBUG_BRIDGE_TT"
+							on_action = "[GetScriptedGui('eu5ts_debug_bridge_land').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).AddScope('trade', Trade.MakeScope).AddScope('from_market', Trade.GetFromMarket.MakeScope).AddScope('to_market', Trade.GetToMarket.MakeScope).End)]"
+						}
+						tooltipwidget = { BasicFunctionalTooltip = {} }
+					}
+
+					text_single = {
+						visible = "[Not(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_ran').IsSet)]"
+						raw_text = "Bridge status: #Y NOT RUN YET#!"
+					}
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_ran').IsSet]"
+						raw_text = "Bridge status: #G JOMINI EFFECT EXECUTED#!"
+					}
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_maritime').IsSet]"
+						raw_text = "Last bridged classifier result: #G MARITIME#!"
+					}
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_land').IsSet]"
+						raw_text = "Last bridged classifier result: #R LAND#!"
+					}
+
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_trade_scope_ok').IsSet]"
+						raw_text = "scope:trade received by Jomini: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_ran').IsSet, Not(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_trade_scope_ok').IsSet))]"
+						raw_text = "scope:trade received by Jomini: #R NO#!"
+					}
+
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_from_market_scope_ok').IsSet]"
+						raw_text = "scope:from_market received: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_ran').IsSet, Not(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_from_market_scope_ok').IsSet))]"
+						raw_text = "scope:from_market received: #R NO#!"
+					}
+
+					text_single = {
+						visible = "[GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_to_market_scope_ok').IsSet]"
+						raw_text = "scope:to_market received: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_ran').IsSet, Not(GetPlayer.MakeScope.GetVariable('eu5ts_debug_bridge_to_market_scope_ok').IsSet))]"
+						raw_text = "scope:to_market received: #R NO#!"
+					}
+
+					text_single = {
+						raw_text = "#Y Goal: prove GUI Trade.MakeScope can enter a normal scripted-GUI Jomini effect.#!"
 						default_format = "#flavor"
 					}
 				}
