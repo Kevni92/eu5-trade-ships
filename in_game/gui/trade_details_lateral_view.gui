@@ -23,6 +23,34 @@ lateralview = {
 			using = window_main_tabs_margin_alt
 			spacing = 6
 
+			# Preserve the Vanilla trade card. Besides the normal trade controls,
+			# this keeps the original selected-trade/highlight UI structure present.
+			ExistingTradeCard = {
+				layoutpolicy_horizontal = expanding
+				size = { -1 40 }
+				blockoverride "trade_ui_actions" {
+					datacontext = "[TradeDetailsLateralView.GetUIAction]"
+					using = button_action_provider
+				}
+				blockoverride "trade_market_names" {
+					text_single = {
+						autoresize = no
+						using = Font_Size_Small
+						layoutpolicy_horizontal = expanding
+						size = { -1 20 }
+						align = left|nobaseline
+						text = "[Trade.GetMarketNames]"
+						default_format = "#subtle_name"
+						block "sort_by_highlight_markets" {}
+						using = bg_number_container_bckg
+						blockoverride "number_container_extra" {
+							alpha = 0.4
+							margin = {4 5}
+						}
+					}
+				}
+			}
+
 			paper_simple_card = {
 				layoutpolicy_horizontal = expanding
 				size = { -1 230 }
@@ -67,7 +95,7 @@ lateralview = {
 					}
 
 					text_single = {
-						raw_text = "Interpretation: valid port endpoint = route has a selected trade port."
+						raw_text = "#Y Runtime result: valid FromPort/ToPort is NOT sufficient to prove sea transport.#!"
 						default_format = "#flavor"
 					}
 				}
