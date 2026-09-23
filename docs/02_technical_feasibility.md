@@ -21,9 +21,10 @@ V1 intentionally ignores fleet position, current missions, embarked armies, war 
 | Status | Meaning |
 |---|---|
 | **Confirmed** | Verified in Vanilla game files or official engine/script documentation. |
-| **Partially confirmed** | The underlying engine value exists, but normal gameplay-script access is not yet confirmed. |
+| **Partially confirmed** | The underlying engine value exists, but normal gameplay-script access is not confirmed. |
 | **Workaround available** | No direct getter is known, but the value can be reconstructed from script-visible data. |
-| **Open** | A required script interface has not yet been verified. |
+| **Open** | A required script interface or semantic detail has not yet been verified. |
+| **Not found** | Targeted research found no corresponding gameplay-script interface in the checked Vanilla/reference corpus. This is not proof that no engine implementation exists. |
 
 ---
 
@@ -204,13 +205,7 @@ merchant_power_in_market = {
 
 Vanilla itself calculates a country's share of Merchant Power by dividing the country-specific value by total market Merchant Power.
 
-The relevant pattern appears in:
-
-```text
-reference_game_files/game/in_game/common/scripted_relations/deny_market_access.txt
-```
-
-Conceptually, the Vanilla calculation is:
+The pattern is:
 
 ```txt
 value = "merchant_power_in_market(country_scope)"
@@ -229,11 +224,9 @@ MarketPowerShare(C, M)
       / total_merchant_power
 ```
 
-No custom reconstruction of Merchant Power is required.
+## Zero-total handling
 
-## Zero-power / zero-total handling
-
-The implementation should explicitly protect against division by zero:
+The implementation must protect against division by zero:
 
 ```text
 if TotalMerchantPower(M) > 0:
@@ -241,8 +234,6 @@ if TotalMerchantPower(M) > 0:
 else:
     share = 0
 ```
-
-Markets in which the country has no Merchant Power should not receive a contribution from that country.
 
 ---
 
@@ -256,8 +247,6 @@ For each country, find every market in which that country participates commercia
 
 **Confirmed**
 
-This is also no longer a V1 blocker.
-
 ## Preferred country-first iterator
 
 Vanilla provides:
@@ -268,9 +257,7 @@ every_market_with_merchants = {
 }
 ```
 
-This iterator is used from country context in Vanilla events and iterates markets in which the country has merchant participation.
-
-For the trade-shipping system, the country-first architecture is therefore viable:
+This makes the preferred V1 architecture viable:
 
 ```text
 Country
@@ -281,15 +268,15 @@ Country
   -> add weighted shipping contribution to market
 ```
 
-A defensive Merchant Power filter can still be applied inside the Market scope:
+A defensive filter can still require:
 
 ```txt
 "merchant_power_in_market(scope:shipping_country)" > 0
 ```
 
-## Alternative world-market sweep
+## Alternative iterators
 
-Vanilla also provides:
+Vanilla also provides the world-market pattern:
 
 ```txt
 every_market_in_world = {
@@ -299,13 +286,7 @@ every_market_in_world = {
 }
 ```
 
-This exact pattern is used in Vanilla Portugal content.
-
-It provides a straightforward fallback if a world-market pass is ever preferable for initialization or debugging.
-
-## Market-first iteration
-
-Market scope also supports:
+and Market scope supports:
 
 ```txt
 every_merchant_in_market = {
@@ -313,31 +294,11 @@ every_merchant_in_market = {
 }
 ```
 
-Inside this iterator the iterated scope is the merchant country.
-
-Therefore both architectures are technically possible:
-
-### Country-first
-
-```text
-Country
-  -> every_market_with_merchants
-```
-
-### Market-first
-
-```text
-Market
-  -> every_merchant_in_market
-```
-
-For V1, **country-first is preferred** because the country transport-capacity pool is already calculated and cached on Country scope.
+Both country-first and market-first architectures are therefore possible. Country-first is preferred for V1 because the country transport-capacity pool is already cached on Country scope.
 
 ---
 
 # 5. Confirmed V1 market-allocation formula
-
-With Sections 3 and 4 resolved, the market allocation can now be defined without speculative syntax or data reconstruction.
 
 For country `C` and market `M`:
 
@@ -399,24 +360,28 @@ Only the origin market receives the demand. The destination market does not rece
 
 **Partially confirmed**
 
-## Confirmed
+## Confirmed Trade data
 
-Trade scope supports at least:
+Trade scope exposes the values/triggers:
 
 ```text
-trade_volume
-from_market
-to_market
 goods
+trade_volume
+trade_buy
+trade_sell
+trade_profit
+trade_capacity_usage_percent
+is_export
+is_locked
 ```
 
-Vanilla uses `trade_volume` directly in Trade conditions.
+Vanilla also exposes `from_market` and `to_market` from Trade scope and uses them in normal gameplay script.
 
-`trade_volume` is therefore the preferred demand basis for this mod. The custom system is intended to model physical cargo volume, not Vanilla Merchant Capacity.
+`trade_volume` is therefore the preferred demand basis for this mod. The custom system models cargo volume, not Vanilla Merchant Capacity.
 
 ## Open part
 
-A reliable script-side classification of whether a Trade requires sea transport remains unresolved.
+A reliable normal-gameplay-script classification of whether an individual Trade requires sea transport remains unresolved.
 
 ---
 
@@ -431,57 +396,203 @@ trade.from_market.location
 trade.to_market.location
 ```
 
-determine whether the Trade requires maritime transport.
+determine whether the actual Trade route requires maritime transport.
 
 ## Status
 
 **Open / current primary V1 blocker**
 
-## Confirmed related functionality
+This research pass resolves several sub-questions, but does not yet provide an exact classifier.
 
-Relevant connectivity concepts include:
+## 7.1 Engine-side port endpoints exist
 
-```text
-is_connected_to
-is_connected_to_through_realm
-within_naval_range_of
-is_coastal
-is_land
-can_find_trade_route
-```
-
-`is_connected_to_through_realm` is explicitly documented as checking land/strait connectivity inside the same realm. That is insufficient for arbitrary international market-to-market routing.
-
-## Important unresolved question
-
-The exact semantics of the more general:
-
-```text
-is_connected_to
-```
-
-still need to be verified before using it as the maritime classifier.
-
-## Promising engine-side clue
-
-The Trade GUI datatype exposes:
+The Vanilla Trade GUI directly uses:
 
 ```text
 Trade.GetFromPort
 Trade.GetToPort
 ```
 
-This proves that the engine internally knows port endpoints for Trade objects.
+The corresponding UI rows are labelled as exporting/importing through a port.
 
-Research should determine whether equivalent Trade-scope information is exposed to gameplay script.
+This is strong evidence that the engine's Trade object internally knows the port endpoints selected for a route.
 
-Possible names such as `from_port` or `to_port` are hypotheses only until verified.
+### Important limitation
 
-## Preferred classification hierarchy
+These functions are GUI/data-model functions. Their existence does **not** imply equivalent gameplay-script event targets.
 
-1. Direct gameplay-script sea-route / port information on Trade.
-2. Verified arbitrary land/strait connectivity test between market centers.
-3. Geographic approximation only if the first two are impossible.
+The official script datatype dump confirms that `Trade` is a script scope (`Trade.MakeScope`), but the normal Trade trigger surface found in Vanilla does not expose these GUI methods.
+
+## 7.2 Gameplay-script `from_port` / `to_port` targets were not found
+
+Targeted repository searches found no verified Trade-scope expressions equivalent to:
+
+```text
+from_port
+to_port
+uses_sea
+is_sea_trade
+trade_distance
+```
+
+`from_port` string matches found in Vanilla were unrelated names such as `chinese_treasure_depart_from_port`, not Trade event targets.
+
+The Vanilla Trade trigger-localization file contains only:
+
+```text
+goods
+trade_volume
+trade_buy
+trade_sell
+trade_profit
+trade_capacity_usage_percent
+is_export
+is_locked
+```
+
+Therefore, based on the currently checked Vanilla/reference corpus:
+
+> **The engine knows Trade port endpoints, but no normal gameplay-script access to those endpoints has been found.**
+
+This should be treated as **GUI-only until proven otherwise**.
+
+## 7.3 `can_find_trade_route` does not classify route medium
+
+Vanilla exposes the Country trigger:
+
+```txt
+can_find_trade_route = {
+    from = <market>
+    to = <market>
+}
+```
+
+Vanilla's `create_trade` action uses it as an expensive pathfinding/reachability check when selecting two markets.
+
+What is verified:
+
+```text
+can_find_trade_route(from, to)
+    -> whether the country can find a valid Trade route
+```
+
+What is **not** exposed by the trigger:
+
+- the path itself,
+- locations traversed,
+- whether sea zones are used,
+- selected ports,
+- land distance vs sea distance.
+
+Therefore `can_find_trade_route` cannot by itself answer the mod's maritime-classification question.
+
+## 7.4 `is_connected_to_through_realm` is precisely documented, but too narrow
+
+Official script documentation defines:
+
+```txt
+is_connected_to_through_realm
+```
+
+as checking whether a Location is connected by **land/strait** to another Location inside the same realm, including the top overlord and subjects.
+
+This makes its semantics useful and reliable, but it cannot classify arbitrary international Market pairs.
+
+For example, an overland Trade between market centers belonging to unrelated countries is outside the guarantee given by this trigger.
+
+Conclusion:
+
+> `is_connected_to_through_realm` is not a general-purpose world Trade route classifier.
+
+## 7.5 `is_connected_to` exists, but its exact semantics remain insufficiently documented
+
+The normal Location trigger:
+
+```txt
+is_connected_to = <location>
+```
+
+is real and widely used by Vanilla.
+
+Examples use it to check connectivity to a capital or between named Locations. However, in the available exact/reference documentation researched so far, no authoritative description was found that establishes all of the following properties needed by this mod:
+
+1. that it searches arbitrary international geography,
+2. that it is strictly land/strait connectivity,
+3. that it ignores ownership/realm boundaries,
+4. that its result corresponds to whether the Trade routing system can avoid sea transport.
+
+Because the newer `is_connected_to_through_realm` trigger is explicitly documented while the older `is_connected_to` semantics are not, V1 must not silently assume these properties.
+
+### Consequence
+
+The tempting classifier:
+
+```text
+if from_market.location is_connected_to to_market.location:
+    land trade
+else:
+    maritime trade
+```
+
+is **not yet accepted as verified implementation logic**.
+
+It may become a viable approximation after controlled in-game tests, but it is not currently source-proven.
+
+## 7.6 Current classification options
+
+### Option A — Direct Trade port/path data
+
+**Preferred, but currently unavailable in gameplay script.**
+
+Ideal logic would be based on `Trade.GetFromPort` / `Trade.GetToPort` or a route/path object. No gameplay-script equivalent has been found.
+
+### Option B — `is_connected_to` fallback
+
+**Potentially viable, but requires runtime verification.**
+
+If controlled tests demonstrate that `is_connected_to` means arbitrary land/strait connectivity across realms, V1 can classify:
+
+```text
+land-required = from_location is_connected_to to_location
+sea-required  = NOT land-required
+```
+
+This would classify based on whether a land/strait connection exists between market centers, not necessarily the exact route chosen internally by the Trade engine.
+
+### Option C — Geographic approximation
+
+**Last resort only.**
+
+Examples could combine coastal status and a verified connectivity test. Pure tests such as "both markets are coastal" are insufficient because two coastal markets can still be connected overland.
+
+No geographic approximation should be implemented before Option B is tested.
+
+## 7.7 Required runtime verification matrix
+
+The next prototype should test `is_connected_to` against known Location pairs representing distinct cases:
+
+| Case | Expected property to test |
+|---|---|
+| Two Locations on the same continuous landmass | should be connected if trigger is geographic land connectivity |
+| Two Locations separated by ordinary sea | should not be connected |
+| Island to mainland | should not be connected unless a strait counts |
+| Locations connected by a defined strait | determines whether straits count |
+| Locations in different independent countries but same landmass | tests whether realm/ownership matters |
+| Two coastal Locations with an obvious overland path | verifies that coastal status does not force maritime classification |
+
+The test must compare `is_connected_to` with `is_connected_to_through_realm` where applicable, and should be run in the exact target game version.
+
+## 7.8 Current conclusion
+
+The maritime-classifier problem is narrower than before:
+
+- Trade port endpoints: **confirmed engine-side, GUI access only so far**.
+- Direct gameplay Trade sea/path flag: **not found**.
+- `can_find_trade_route`: **confirmed reachability only**.
+- `is_connected_to_through_realm`: **confirmed land/strait semantics, realm-limited**.
+- `is_connected_to`: **confirmed trigger, exact semantics not sufficiently documented for V1 yet**.
+
+The highest-value next action is therefore a small runtime/debug test of `is_connected_to`, rather than more speculative script syntax.
 
 ---
 
@@ -502,8 +613,6 @@ MarketTransportCapacity(M)
 ## Status
 
 **Feasible**
-
-The previously missing Merchant Power inputs are now confirmed.
 
 A cached value should conceptually store:
 
@@ -599,7 +708,7 @@ Potential later targets include:
 - market access,
 - other market-level economic modifiers.
 
-The first milestone should expose the calculated values for debugging before applying consequences.
+The first milestone should expose calculated values for debugging before applying consequences.
 
 ---
 
@@ -642,8 +751,6 @@ for each market M:
 
 ## Step 3 — Distribute each country's pool by Merchant Power share
 
-Preferred architecture:
-
 ```text
 for each country C:
     for each M in C.every_market_with_merchants:
@@ -654,7 +761,7 @@ for each country C:
                 CountryTransportCapacity(C) * share
 ```
 
-The key values are confirmed as:
+Confirmed values:
 
 ```txt
 "merchant_power_in_market(country_scope)"
@@ -669,7 +776,7 @@ for each Trade T:
         T.from_market.SeaTradeDemand += T.trade_volume
 ```
 
-This is the remaining unresolved core step because the maritime classifier is not yet confirmed.
+This remains the unresolved core step.
 
 ## Step 5 — Calculate coverage
 
@@ -694,7 +801,7 @@ for each market M:
 
 **Current primary blocker.**
 
-Need a reliable way to determine whether an outgoing Trade requires maritime transport.
+The engine knows the selected Trade ports, but no gameplay-script accessor for those endpoints has been found. The best remaining candidate is a validated `is_connected_to`-based classifier.
 
 ## Blocker 2 — Effective ship transport-capacity getter
 
@@ -704,8 +811,6 @@ This already has a practical fallback: reconstruct capacity from ship type/categ
 
 ## Resolved — Merchant Power share
 
-No longer a blocker.
-
 Confirmed gameplay-script values:
 
 ```text
@@ -713,15 +818,7 @@ merchant_power_in_market(country)
 total_merchant_power
 ```
 
-Confirmed Vanilla share formula:
-
-```text
-merchant_power_in_market(country) / total_merchant_power
-```
-
 ## Resolved — Relevant market iteration
-
-No longer a blocker.
 
 Confirmed iterators/predicates include:
 
@@ -740,37 +837,39 @@ every_merchant_in_market
 |---|---|---:|---|
 | Iterate country units | **Confirmed** | No | — |
 | Iterate ship subunits | **Confirmed** | No | — |
-| Identify subunit type | **Confirmed** | No | — |
-| Identify naval category | **Confirmed** | No | — |
+| Identify subunit type/category | **Confirmed** | No | — |
 | Vanilla `transport_capacity` exists | **Confirmed** | No | — |
 | Direct gameplay getter for effective fleet transport capacity | **Partially confirmed** | No | Reconstruct from ship definitions |
 | Country-wide transport-capacity cache | **Feasible** | No | Script variable |
-| `merchant_power_in_market(country)` | **Confirmed** | No | — |
-| `total_merchant_power` | **Confirmed** | No | — |
-| Merchant Power share | **Confirmed** | No | Divide country power by total power |
-| `every_market_with_merchants` | **Confirmed** | No | `every_market_in_world` + `has_merchant` |
-| `every_merchant_in_market` | **Confirmed** | No | — |
+| Merchant Power in market, numeric | **Confirmed** | No | — |
+| Total Merchant Power | **Confirmed** | No | — |
+| Merchant Power share | **Confirmed** | No | Divide power by total |
+| Relevant market iteration | **Confirmed** | No | Multiple iterator architectures available |
 | Trade `trade_volume` | **Confirmed** | No | — |
 | Trade `from_market` / `to_market` | **Confirmed** | No | — |
-| Determine sea-required Trade | **Open** | **Yes** | Connectivity approximation only if verified |
-| Market shipping-capacity sum | **Feasible** | No | Cached variable/value |
-| Shipping coverage calculation | **Feasible** | No | Cached variable/value |
+| Engine Trade port endpoints | **Confirmed GUI-side** | No by itself | `Trade.GetFromPort`, `Trade.GetToPort` |
+| Gameplay Trade port endpoints | **Not found** | **Yes** for exact port classifier | Test connectivity fallback |
+| Direct Trade `uses_sea` / sea-route flag | **Not found** | **Yes** for exact classifier | Test connectivity fallback |
+| `can_find_trade_route` | **Confirmed** | No | Reachability only; no route-medium output |
+| `is_connected_to_through_realm` | **Confirmed** | No | Land/strait, but realm-limited |
+| `is_connected_to` | **Confirmed trigger; semantics open** | **Yes** | Runtime verification required |
+| Market shipping-capacity sum | **Feasible** | No | Script variable |
+| Shipping coverage calculation | **Feasible** | No | Script values/variables |
 | Final economic penalty | **Open by design** | No | Delay until calculation works |
 
 ---
 
 # 16. V1 non-goals
 
-V1 explicitly does **not** model:
+The first implementation explicitly does **not** model:
 
 - fleet position,
-- port assignment,
+- port assignment of player fleets,
 - naval missions,
-- physical shipping lanes,
-- individual route capacity allocation,
+- physical allocation of ships to individual Trade routes,
 - distance-weighted shipping cost,
 - simultaneous overcommitment of the same national fleet across several markets,
-- military use reducing commercial capacity,
+- military use of transport capacity reducing commercial capacity,
 - blockade effects,
 - piracy effects,
 - wartime disruption,
@@ -781,125 +880,38 @@ These can be reconsidered only after the global-pool model is functional and pro
 
 ---
 
-# 17. Source evidence for Merchant Power research
+# 17. Next research and prototype tasks
 
-The Merchant Power result is based on Vanilla game files, not inferred from GUI behavior.
+Proceed in this order:
 
-## Country-specific Merchant Power and total market Merchant Power
-
-```text
-reference_game_files/game/in_game/common/scripted_relations/deny_market_access.txt
-```
-
-Vanilla reads:
-
-```text
-merchant_power_in_market(country_scope)
-total_merchant_power
-```
-
-and directly divides the former by the latter.
-
-## Trigger registration
-
-```text
-reference_game_files/game/in_game/common/trigger_localization/market_triggers.txt
-```
-
-contains entries for:
-
-```text
-merchant_power_in_market
-total_merchant_power
-```
-
-## Direct scoped numeric use
-
-```text
-reference_game_files/game/in_game/common/missions/generic_capital_economy_mission_pack.txt
-```
-
-uses:
-
-```text
-scope:mission_target_market.merchant_power_in_market(root)
-```
-
-as a numeric script value.
-
-## Country -> relevant markets
-
-Vanilla uses:
-
-```text
-every_market_with_merchants
-```
-
-in multiple events, including economy and flavor content.
-
-## World-market alternative
-
-```text
-reference_game_files/game/in_game/events/DHE/flavor_por.txt
-```
-
-uses:
-
-```txt
-every_market_in_world = {
-    limit = {
-        has_merchant = root
-    }
-}
-```
-
-and also uses `any_market_with_merchants` / `random_market_with_merchants`.
-
-## Market -> merchant countries
-
-Vanilla uses:
-
-```text
-every_merchant_in_market
-```
-
-in multiple events and scripted relations.
-
----
-
-# 18. Next research tasks
-
-Research should now proceed in this order:
-
-1. **Find the strongest reliable maritime-Trade classifier.**
-2. Search for a direct gameplay getter for effective ship/subunit `transport_capacity`.
-3. Prototype the country-first Merchant Power distribution using `every_market_with_merchants`.
-4. Verify the preferred cache/storage scopes and monthly reset/update architecture.
-5. Add debug output/UI exposing:
+1. **Build a minimal exact-version runtime/debug test for `is_connected_to`.**
+   - same landmass,
+   - cross-border land connection,
+   - ordinary sea separation,
+   - island/mainland,
+   - strait connection,
+   - coastal locations with an overland connection.
+2. Compare results with `is_connected_to_through_realm` where applicable.
+3. If `is_connected_to` proves suitable, define and document the V1 maritime classifier explicitly.
+4. If it does not, inspect exact-version generated `script_docs` for any Trade route/path targets not present in the current reference corpus.
+5. Continue searching for a direct gameplay getter for effective ship/fleet `transport_capacity`; otherwise implement the centralized lookup fallback.
+6. Prototype cached country and market variables.
+7. Add debug output/UI exposing:
    - country transport capacity,
-   - country Merchant Power share in selected markets,
+   - country Merchant Power share in a selected market,
    - market sea-trade demand,
    - market available shipping capacity,
    - shipping coverage.
-6. Collect save-game samples to choose `SHIPPING_CAPACITY_MULTIPLIER`.
-7. Only after validation, design the gameplay penalty for insufficient coverage.
+8. Only after validation, design the gameplay penalty for insufficient shipping coverage.
 
 ---
 
-# 19. Current feasibility conclusion
+# 18. Current feasibility conclusion
 
-The Merchant Power side of the V1 concept is now technically confirmed.
+The global shipping-pool and Merchant-Power allocation parts of V1 are technically well supported by verified gameplay-script primitives.
 
-EU5 gameplay script exposes all primitives required to distribute a country's global shipping pool across its commercially influenced markets:
+The remaining fundamental uncertainty is narrowly concentrated in **classifying individual Trade objects as requiring sea transport**.
 
-```text
-merchant_power_in_market(country)
-total_merchant_power
-every_market_with_merchants
-```
+The engine demonstrably knows the route's port endpoints through `Trade.GetFromPort` and `Trade.GetToPort`, but that information has not been found on the normal gameplay-script surface. `can_find_trade_route` proves only route reachability. `is_connected_to_through_realm` has clear land/strait semantics but is realm-limited. The ordinary `is_connected_to` trigger exists and is the most promising fallback, but its exact semantics must be verified in the target game version before it becomes production logic.
 
-Vanilla itself demonstrates the exact share calculation required by the design.
-
-Therefore the main unresolved requirement for an exact V1 implementation is now **maritime classification of individual Trade objects**.
-
-The absence of a direct gameplay getter for effective fleet `transport_capacity` is secondary because a ship-definition lookup provides a workable fallback.
+Therefore implementation can proceed on all other V1 components, while the maritime classifier should remain behind a small dedicated research/debug prototype rather than being based on guessed syntax or undocumented assumptions.
