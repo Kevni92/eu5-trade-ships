@@ -170,26 +170,36 @@ lateralview = {
 						raw_text = "#Y --- GUI -> JOMINI BRIDGE TEST ---#!"
 					}
 
-					button_regular = {
-						size = { 100% 30 }
-						text = "EU5TS_DEBUG_RUN_MARITIME_BRIDGE"
+					button_default = {
+						layoutpolicy_horizontal = expanding
+						size = { -1 30 }
 						visible = "[Or(And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid), And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid))]"
-						action_tooltip = {
-							title = "EU5TS_DEBUG_BRIDGE_TT"
-							on_action = "[GetScriptedGui('eu5ts_debug_bridge_maritime').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).AddScope('trade', Trade.MakeScope).AddScope('from_market', Trade.GetFromMarket.MakeScope).AddScope('to_market', Trade.GetToMarket.MakeScope).End)]"
+						onclick = "[GetScriptedGui('eu5ts_debug_bridge_maritime').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).AddScope('trade', Trade.MakeScope).AddScope('from_market', Trade.GetFromMarket.MakeScope).AddScope('to_market', Trade.GetToMarket.MakeScope).End)]"
+						tooltip = "EU5TS_DEBUG_BRIDGE_TT"
+						hbox = {
+							layoutpolicy_horizontal = expanding
+							text_single = {
+								size = { 100% 100% }
+								align = center|nobaseline
+								text = "EU5TS_DEBUG_RUN_MARITIME_BRIDGE"
+							}
 						}
-						tooltipwidget = { BasicFunctionalTooltip = {} }
 					}
 
-					button_regular = {
-						size = { 100% 30 }
-						text = "EU5TS_DEBUG_RUN_LAND_BRIDGE"
+					button_default = {
+						layoutpolicy_horizontal = expanding
+						size = { -1 30 }
 						visible = "[Not(Or(And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid), And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid)))]"
-						action_tooltip = {
-							title = "EU5TS_DEBUG_BRIDGE_TT"
-							on_action = "[GetScriptedGui('eu5ts_debug_bridge_land').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).AddScope('trade', Trade.MakeScope).AddScope('from_market', Trade.GetFromMarket.MakeScope).AddScope('to_market', Trade.GetToMarket.MakeScope).End)]"
+						onclick = "[GetScriptedGui('eu5ts_debug_bridge_land').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).AddScope('trade', Trade.MakeScope).AddScope('from_market', Trade.GetFromMarket.MakeScope).AddScope('to_market', Trade.GetToMarket.MakeScope).End)]"
+						tooltip = "EU5TS_DEBUG_BRIDGE_TT"
+						hbox = {
+							layoutpolicy_horizontal = expanding
+							text_single = {
+								size = { 100% 100% }
+								align = center|nobaseline
+								text = "EU5TS_DEBUG_RUN_LAND_BRIDGE"
+							}
 						}
-						tooltipwidget = { BasicFunctionalTooltip = {} }
 					}
 
 					text_single = {
