@@ -1,0 +1,40 @@
+﻿l_english:
+ eu5_trade_ships_connectivity_test.1.title: "Trade Ships Connectivity Runtime Test"
+ eu5_trade_ships_connectivity_test.1.desc: "This debug chain compares the Location triggers is_connected_to and is_connected_to_through_realm on five fixed geography pairs. Record the GENERAL and REALM result shown on each screen. No game state is changed."
+ eu5_trade_ships_connectivity_test.1.a: "Run the five tests"
+
+ eu5_trade_ships_connectivity_test.next: "Next test"
+
+ eu5_trade_ships_connectivity_test.2.title: "Test 1/5 - London to Oxford"
+ eu5_trade_ships_connectivity_test.2.desc.yy: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: YES\n\nControl case: land connectivity inside the English realm."
+ eu5_trade_ships_connectivity_test.2.desc.yn: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: NO\n\nUnexpected for the control case; record this exactly."
+ eu5_trade_ships_connectivity_test.2.desc.ny: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: YES\n\nUnexpected asymmetry; record this exactly."
+ eu5_trade_ships_connectivity_test.2.desc.nn: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: NO\n\nUnexpected for the control case; record this exactly."
+
+ eu5_trade_ships_connectivity_test.3.title: "Test 2/5 - Kobenhavn to Malmo"
+ eu5_trade_ships_connectivity_test.3.desc.yy: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: YES\n\nStrait-oriented control case across Oresund. This is the expected pattern if realm connectivity includes straits here."
+ eu5_trade_ships_connectivity_test.3.desc.yn: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: NO\n\nRecord this result; it would mean the two triggers disagree on this strait-oriented pair."
+ eu5_trade_ships_connectivity_test.3.desc.ny: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: YES\n\nRecord this result; this would be an unusual asymmetry."
+ eu5_trade_ships_connectivity_test.3.desc.nn: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: NO\n\nRecord this result; the strait-oriented pair is not treated as connected by either trigger in the current state."
+
+ eu5_trade_ships_connectivity_test.4.title: "Test 3/5 - Paris to Madrid"
+ eu5_trade_ships_connectivity_test.4.desc.yy: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: YES\n\nBoth triggers consider the continental pair connected."
+ eu5_trade_ships_connectivity_test.4.desc.yn: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: NO\n\nThis is the key pattern we are looking for if is_connected_to follows land connectivity across political borders while the realm variant is ownership-limited."
+ eu5_trade_ships_connectivity_test.4.desc.ny: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: YES\n\nUnexpected asymmetry; record this exactly."
+ eu5_trade_ships_connectivity_test.4.desc.nn: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: NO\n\nThe general trigger is not finding continental connectivity for this international pair."
+
+ eu5_trade_ships_connectivity_test.5.title: "Test 4/5 - Rome to Naples"
+ eu5_trade_ships_connectivity_test.5.desc.yy: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: YES\n\nBoth triggers consider the Italian land pair connected."
+ eu5_trade_ships_connectivity_test.5.desc.yn: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: NO\n\nThis supports the hypothesis that is_connected_to can cross political borders while the realm variant cannot."
+ eu5_trade_ships_connectivity_test.5.desc.ny: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: YES\n\nUnexpected asymmetry; record this exactly."
+ eu5_trade_ships_connectivity_test.5.desc.nn: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: NO\n\nThe general trigger is not finding continental connectivity for this international pair."
+
+ eu5_trade_ships_connectivity_test.6.title: "Test 5/5 - London to Paris"
+ eu5_trade_ships_connectivity_test.6.desc.yy: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: YES\n\nBoth triggers bridge the English Channel in the current state. That would make is_connected_to unsuitable as a simple no-sea classifier."
+ eu5_trade_ships_connectivity_test.6.desc.yn: "GENERAL is_connected_to: YES\nREALM is_connected_to_through_realm: NO\n\nThe general trigger crosses the Channel. That would make it unsuitable as a simple no-sea classifier."
+ eu5_trade_ships_connectivity_test.6.desc.ny: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: YES\n\nUnexpected asymmetry; record this exactly."
+ eu5_trade_ships_connectivity_test.6.desc.nn: "GENERAL is_connected_to: NO\nREALM is_connected_to_through_realm: NO\n\nThis is the expected pattern if the Channel breaks land/strait connectivity."
+
+ eu5_trade_ships_connectivity_test.7.title: "Connectivity Test Complete"
+ eu5_trade_ships_connectivity_test.7.desc: "Please report the five result pairs in this order:\n1. London-Oxford\n2. Kobenhavn-Malmo\n3. Paris-Madrid\n4. Rome-Naples\n5. London-Paris\n\nUse GENERAL/REALM, for example YES/YES, YES/YES, YES/NO, YES/NO, NO/NO. That example is only the working hypothesis, not a hard-coded expected answer."
+ eu5_trade_ships_connectivity_test.7.a: "Finish"
