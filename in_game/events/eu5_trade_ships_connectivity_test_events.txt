@@ -17,236 +17,271 @@ eu5_trade_ships_connectivity_test.1 = {
 eu5_trade_ships_connectivity_test.2 = {
 	type = country_event
 	title = eu5_trade_ships_connectivity_test.2.title
-	desc = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					location:london = {
-						is_connected_to = location:oxford
-						is_connected_to_through_realm = location:oxford
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.2.desc.yy
-			}
-			triggered_desc = {
-				trigger = {
-					location:london = {
-						is_connected_to = location:oxford
-						NOT = { is_connected_to_through_realm = location:oxford }
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.2.desc.yn
-			}
-			triggered_desc = {
-				trigger = {
-					location:london = {
-						NOT = { is_connected_to = location:oxford }
-						is_connected_to_through_realm = location:oxford
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.2.desc.ny
-			}
-			triggered_desc = {
-				desc = eu5_trade_ships_connectivity_test.2.desc.nn
-			}
-		}
-	}
+	desc = eu5_trade_ships_connectivity_test.2.desc
 	fire_only_once = yes
 	hide_portraits = yes
 	outcome = neutral
 
 	option = {
-		name = eu5_trade_ships_connectivity_test.next
+		name = eu5_trade_ships_connectivity_test.result.yy
+		trigger = {
+			location:london = {
+				is_connected_to = location:oxford
+				is_connected_to_through_realm = location:oxford
+			}
+		}
 		trigger_event_non_silently = eu5_trade_ships_connectivity_test.3
 	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.yn
+		trigger = {
+			location:london = {
+				is_connected_to = location:oxford
+				NOT = { is_connected_to_through_realm = location:oxford }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.3
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.ny
+		trigger = {
+			location:london = {
+				NOT = { is_connected_to = location:oxford }
+				is_connected_to_through_realm = location:oxford
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.3
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.nn
+		trigger = {
+			location:london = {
+				NOT = { is_connected_to = location:oxford }
+				NOT = { is_connected_to_through_realm = location:oxford }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.3
+	}
+
 }
 
 eu5_trade_ships_connectivity_test.3 = {
 	type = country_event
 	title = eu5_trade_ships_connectivity_test.3.title
-	desc = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					location:kobenhavn = {
-						is_connected_to = location:malmo
-						is_connected_to_through_realm = location:malmo
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.3.desc.yy
-			}
-			triggered_desc = {
-				trigger = {
-					location:kobenhavn = {
-						is_connected_to = location:malmo
-						NOT = { is_connected_to_through_realm = location:malmo }
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.3.desc.yn
-			}
-			triggered_desc = {
-				trigger = {
-					location:kobenhavn = {
-						NOT = { is_connected_to = location:malmo }
-						is_connected_to_through_realm = location:malmo
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.3.desc.ny
-			}
-			triggered_desc = {
-				desc = eu5_trade_ships_connectivity_test.3.desc.nn
-			}
-		}
-	}
+	desc = eu5_trade_ships_connectivity_test.3.desc
 	fire_only_once = yes
 	hide_portraits = yes
 	outcome = neutral
 
 	option = {
-		name = eu5_trade_ships_connectivity_test.next
+		name = eu5_trade_ships_connectivity_test.result.yy
+		trigger = {
+			location:kobenhavn = {
+				is_connected_to = location:malmo
+				is_connected_to_through_realm = location:malmo
+			}
+		}
 		trigger_event_non_silently = eu5_trade_ships_connectivity_test.4
 	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.yn
+		trigger = {
+			location:kobenhavn = {
+				is_connected_to = location:malmo
+				NOT = { is_connected_to_through_realm = location:malmo }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.4
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.ny
+		trigger = {
+			location:kobenhavn = {
+				NOT = { is_connected_to = location:malmo }
+				is_connected_to_through_realm = location:malmo
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.4
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.nn
+		trigger = {
+			location:kobenhavn = {
+				NOT = { is_connected_to = location:malmo }
+				NOT = { is_connected_to_through_realm = location:malmo }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.4
+	}
+
 }
 
 eu5_trade_ships_connectivity_test.4 = {
 	type = country_event
 	title = eu5_trade_ships_connectivity_test.4.title
-	desc = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					location:paris = {
-						is_connected_to = location:madrid
-						is_connected_to_through_realm = location:madrid
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.4.desc.yy
-			}
-			triggered_desc = {
-				trigger = {
-					location:paris = {
-						is_connected_to = location:madrid
-						NOT = { is_connected_to_through_realm = location:madrid }
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.4.desc.yn
-			}
-			triggered_desc = {
-				trigger = {
-					location:paris = {
-						NOT = { is_connected_to = location:madrid }
-						is_connected_to_through_realm = location:madrid
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.4.desc.ny
-			}
-			triggered_desc = {
-				desc = eu5_trade_ships_connectivity_test.4.desc.nn
-			}
-		}
-	}
+	desc = eu5_trade_ships_connectivity_test.4.desc
 	fire_only_once = yes
 	hide_portraits = yes
 	outcome = neutral
 
 	option = {
-		name = eu5_trade_ships_connectivity_test.next
+		name = eu5_trade_ships_connectivity_test.result.yy
+		trigger = {
+			location:paris = {
+				is_connected_to = location:madrid
+				is_connected_to_through_realm = location:madrid
+			}
+		}
 		trigger_event_non_silently = eu5_trade_ships_connectivity_test.5
 	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.yn
+		trigger = {
+			location:paris = {
+				is_connected_to = location:madrid
+				NOT = { is_connected_to_through_realm = location:madrid }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.5
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.ny
+		trigger = {
+			location:paris = {
+				NOT = { is_connected_to = location:madrid }
+				is_connected_to_through_realm = location:madrid
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.5
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.nn
+		trigger = {
+			location:paris = {
+				NOT = { is_connected_to = location:madrid }
+				NOT = { is_connected_to_through_realm = location:madrid }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.5
+	}
+
 }
 
 eu5_trade_ships_connectivity_test.5 = {
 	type = country_event
 	title = eu5_trade_ships_connectivity_test.5.title
-	desc = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					location:rome = {
-						is_connected_to = location:naples
-						is_connected_to_through_realm = location:naples
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.5.desc.yy
-			}
-			triggered_desc = {
-				trigger = {
-					location:rome = {
-						is_connected_to = location:naples
-						NOT = { is_connected_to_through_realm = location:naples }
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.5.desc.yn
-			}
-			triggered_desc = {
-				trigger = {
-					location:rome = {
-						NOT = { is_connected_to = location:naples }
-						is_connected_to_through_realm = location:naples
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.5.desc.ny
-			}
-			triggered_desc = {
-				desc = eu5_trade_ships_connectivity_test.5.desc.nn
-			}
-		}
-	}
+	desc = eu5_trade_ships_connectivity_test.5.desc
 	fire_only_once = yes
 	hide_portraits = yes
 	outcome = neutral
 
 	option = {
-		name = eu5_trade_ships_connectivity_test.next
+		name = eu5_trade_ships_connectivity_test.result.yy
+		trigger = {
+			location:rome = {
+				is_connected_to = location:naples
+				is_connected_to_through_realm = location:naples
+			}
+		}
 		trigger_event_non_silently = eu5_trade_ships_connectivity_test.6
 	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.yn
+		trigger = {
+			location:rome = {
+				is_connected_to = location:naples
+				NOT = { is_connected_to_through_realm = location:naples }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.6
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.ny
+		trigger = {
+			location:rome = {
+				NOT = { is_connected_to = location:naples }
+				is_connected_to_through_realm = location:naples
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.6
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.nn
+		trigger = {
+			location:rome = {
+				NOT = { is_connected_to = location:naples }
+				NOT = { is_connected_to_through_realm = location:naples }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.6
+	}
+
 }
 
 eu5_trade_ships_connectivity_test.6 = {
 	type = country_event
 	title = eu5_trade_ships_connectivity_test.6.title
-	desc = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					location:london = {
-						is_connected_to = location:paris
-						is_connected_to_through_realm = location:paris
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.6.desc.yy
-			}
-			triggered_desc = {
-				trigger = {
-					location:london = {
-						is_connected_to = location:paris
-						NOT = { is_connected_to_through_realm = location:paris }
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.6.desc.yn
-			}
-			triggered_desc = {
-				trigger = {
-					location:london = {
-						NOT = { is_connected_to = location:paris }
-						is_connected_to_through_realm = location:paris
-					}
-				}
-				desc = eu5_trade_ships_connectivity_test.6.desc.ny
-			}
-			triggered_desc = {
-				desc = eu5_trade_ships_connectivity_test.6.desc.nn
-			}
-		}
-	}
+	desc = eu5_trade_ships_connectivity_test.6.desc
 	fire_only_once = yes
 	hide_portraits = yes
 	outcome = neutral
 
 	option = {
-		name = eu5_trade_ships_connectivity_test.next
+		name = eu5_trade_ships_connectivity_test.result.yy
+		trigger = {
+			location:london = {
+				is_connected_to = location:paris
+				is_connected_to_through_realm = location:paris
+			}
+		}
 		trigger_event_non_silently = eu5_trade_ships_connectivity_test.7
 	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.yn
+		trigger = {
+			location:london = {
+				is_connected_to = location:paris
+				NOT = { is_connected_to_through_realm = location:paris }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.7
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.ny
+		trigger = {
+			location:london = {
+				NOT = { is_connected_to = location:paris }
+				is_connected_to_through_realm = location:paris
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.7
+	}
+
+	option = {
+		name = eu5_trade_ships_connectivity_test.result.nn
+		trigger = {
+			location:london = {
+				NOT = { is_connected_to = location:paris }
+				NOT = { is_connected_to_through_realm = location:paris }
+			}
+		}
+		trigger_event_non_silently = eu5_trade_ships_connectivity_test.7
+	}
+
 }
 
 eu5_trade_ships_connectivity_test.7 = {
