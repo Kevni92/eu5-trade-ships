@@ -53,10 +53,10 @@ lateralview = {
 
 			paper_simple_card = {
 				layoutpolicy_horizontal = expanding
-				size = { -1 230 }
+				size = { -1 500 }
 				vbox = {
 					margin = { 12 12 }
-					spacing = 6
+					spacing = 4
 
 					text_single = {
 						raw_text = "#Y TRADE SHIPPING DEBUG#!"
@@ -77,6 +77,9 @@ lateralview = {
 					}
 
 					text_single = {
+						raw_text = "#Y --- FROM ENDPOINT ---#!"
+					}
+					text_single = {
 						visible = "[Trade.GetFromPort.IsValid]"
 						raw_text = "#G FromPort: [Trade.GetFromPort.GetNameWithNoTooltip]#!"
 					}
@@ -85,6 +88,36 @@ lateralview = {
 						raw_text = "#R FromPort: NONE / INVALID#!"
 					}
 
+					text_single = {
+						visible = "[And(Trade.GetFromPort.IsValid, Trade.GetFromPort.IsCoastal)]"
+						raw_text = "FromPort IsCoastal: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetFromPort.IsValid, Not(Trade.GetFromPort.IsCoastal))]"
+						raw_text = "FromPort IsCoastal: #R NO#!"
+					}
+
+					text_single = {
+						visible = "[And(Trade.GetFromPort.IsValid, Trade.GetFromPort.HasPort)]"
+						raw_text = "FromPort HasPort: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetFromPort.IsValid, Not(Trade.GetFromPort.HasPort))]"
+						raw_text = "FromPort HasPort: #R NO#!"
+					}
+
+					text_single = {
+						visible = "[And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid)]"
+						raw_text = "#G FromPort SeaZone: [Trade.GetFromPort.GetPortSeaZone.GetNameWithNoTooltip]#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetFromPort.IsValid, Not(Trade.GetFromPort.GetPortSeaZone.IsValid))]"
+						raw_text = "#R FromPort SeaZone: NONE / INVALID#!"
+					}
+
+					text_single = {
+						raw_text = "#Y --- TO ENDPOINT ---#!"
+					}
 					text_single = {
 						visible = "[Trade.GetToPort.IsValid]"
 						raw_text = "#G ToPort: [Trade.GetToPort.GetNameWithNoTooltip]#!"
@@ -95,7 +128,34 @@ lateralview = {
 					}
 
 					text_single = {
-						raw_text = "#Y Runtime result: valid FromPort/ToPort is NOT sufficient to prove sea transport.#!"
+						visible = "[And(Trade.GetToPort.IsValid, Trade.GetToPort.IsCoastal)]"
+						raw_text = "ToPort IsCoastal: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetToPort.IsValid, Not(Trade.GetToPort.IsCoastal))]"
+						raw_text = "ToPort IsCoastal: #R NO#!"
+					}
+
+					text_single = {
+						visible = "[And(Trade.GetToPort.IsValid, Trade.GetToPort.HasPort)]"
+						raw_text = "ToPort HasPort: #G YES#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetToPort.IsValid, Not(Trade.GetToPort.HasPort))]"
+						raw_text = "ToPort HasPort: #R NO#!"
+					}
+
+					text_single = {
+						visible = "[And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid)]"
+						raw_text = "#G ToPort SeaZone: [Trade.GetToPort.GetPortSeaZone.GetNameWithNoTooltip]#!"
+					}
+					text_single = {
+						visible = "[And(Trade.GetToPort.IsValid, Not(Trade.GetToPort.GetPortSeaZone.IsValid))]"
+						raw_text = "#R ToPort SeaZone: NONE / INVALID#!"
+					}
+
+					text_single = {
+						raw_text = "#Y Runtime result so far: valid FromPort/ToPort alone does NOT prove sea transport.#!"
 						default_format = "#flavor"
 					}
 				}
