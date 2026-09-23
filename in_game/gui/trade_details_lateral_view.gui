@@ -53,7 +53,7 @@ lateralview = {
 
 			paper_simple_card = {
 				layoutpolicy_horizontal = expanding
-				size = { -1 500 }
+				size = { -1 540 }
 				vbox = {
 					margin = { 12 12 }
 					spacing = 4
@@ -155,7 +155,19 @@ lateralview = {
 					}
 
 					text_single = {
-						raw_text = "#Y Runtime result so far: valid FromPort/ToPort alone does NOT prove sea transport.#!"
+						raw_text = "#Y --- CANDIDATE CLASSIFIER ---#!"
+					}
+					text_single = {
+						visible = "[Or(And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid), And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid))]"
+						raw_text = "#G CANDIDATE SHIPPING: YES#!"
+					}
+					text_single = {
+						visible = "[Not(Or(And(Trade.GetFromPort.IsValid, Trade.GetFromPort.GetPortSeaZone.IsValid), And(Trade.GetToPort.IsValid, Trade.GetToPort.GetPortSeaZone.IsValid)))]"
+						raw_text = "#R CANDIDATE SHIPPING: NO#!"
+					}
+
+					text_single = {
+						raw_text = "#Y Hypothesis: any valid endpoint SeaZone may indicate a maritime leg. Needs false-positive testing.#!"
 						default_format = "#flavor"
 					}
 				}
