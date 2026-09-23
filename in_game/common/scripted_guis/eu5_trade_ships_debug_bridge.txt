@@ -1,0 +1,67 @@
+eu5ts_debug_bridge_maritime = {
+	scope = country
+	saved_scopes = { trade from_market to_market }
+
+	is_shown = { always = yes }
+	is_valid = { always = yes }
+
+	effect = {
+		# Reset the previous bridge-test state first.
+		remove_variable = eu5ts_debug_bridge_ran
+		remove_variable = eu5ts_debug_bridge_maritime
+		remove_variable = eu5ts_debug_bridge_land
+		remove_variable = eu5ts_debug_bridge_trade_scope_ok
+		remove_variable = eu5ts_debug_bridge_from_market_scope_ok
+		remove_variable = eu5ts_debug_bridge_to_market_scope_ok
+
+		set_variable = { name = eu5ts_debug_bridge_ran value = 1 }
+		set_variable = { name = eu5ts_debug_bridge_maritime value = 1 }
+
+		if = {
+			limit = { exists = scope:trade }
+			set_variable = { name = eu5ts_debug_bridge_trade_scope_ok value = 1 }
+		}
+		if = {
+			limit = { exists = scope:from_market }
+			set_variable = { name = eu5ts_debug_bridge_from_market_scope_ok value = 1 }
+		}
+		if = {
+			limit = { exists = scope:to_market }
+			set_variable = { name = eu5ts_debug_bridge_to_market_scope_ok value = 1 }
+		}
+	}
+}
+
+eu5ts_debug_bridge_land = {
+	scope = country
+	saved_scopes = { trade from_market to_market }
+
+	is_shown = { always = yes }
+	is_valid = { always = yes }
+
+	effect = {
+		# Reset the previous bridge-test state first.
+		remove_variable = eu5ts_debug_bridge_ran
+		remove_variable = eu5ts_debug_bridge_maritime
+		remove_variable = eu5ts_debug_bridge_land
+		remove_variable = eu5ts_debug_bridge_trade_scope_ok
+		remove_variable = eu5ts_debug_bridge_from_market_scope_ok
+		remove_variable = eu5ts_debug_bridge_to_market_scope_ok
+
+		set_variable = { name = eu5ts_debug_bridge_ran value = 1 }
+		set_variable = { name = eu5ts_debug_bridge_land value = 1 }
+
+		if = {
+			limit = { exists = scope:trade }
+			set_variable = { name = eu5ts_debug_bridge_trade_scope_ok value = 1 }
+		}
+		if = {
+			limit = { exists = scope:from_market }
+			set_variable = { name = eu5ts_debug_bridge_from_market_scope_ok value = 1 }
+		}
+		if = {
+			limit = { exists = scope:to_market }
+			set_variable = { name = eu5ts_debug_bridge_to_market_scope_ok value = 1 }
+		}
+	}
+}
