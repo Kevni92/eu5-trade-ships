@@ -1,0 +1,79 @@
+lateralview = {
+	name = "trade_details_lateral_view"
+
+	blockoverride "panel_header" {
+		datacontext = "[TradeDetailsLateralView.GetTrade]"
+		window_header_alt = {
+			using = bg_main_inner_alt
+			blockoverride "window_header_alt_color_texture" {
+				using = color_default_brown_texture
+			}
+			blockoverride "header_text" {
+				text = "[Trade.GetName]"
+				default_format = "#yellow_titles"
+			}
+		}
+	}
+
+	blockoverride "panel_content" {
+		datacontext = "[TradeDetailsLateralView.GetTrade]"
+		vbox = {
+			using = layoutpolicy_expanding
+			using = bg_main_inner_notabs_alt
+			using = window_main_tabs_margin_alt
+			spacing = 6
+
+			paper_simple_card = {
+				layoutpolicy_horizontal = expanding
+				size = { -1 230 }
+				vbox = {
+					margin = { 12 12 }
+					spacing = 6
+
+					text_single = {
+						raw_text = "#Y TRADE SHIPPING DEBUG#!"
+						fontsize = 18
+					}
+
+					text_single = {
+						raw_text = "From Market: [Trade.GetFromMarket.GetNameWithNoTooltip]"
+					}
+					text_single = {
+						raw_text = "To Market: [Trade.GetToMarket.GetNameWithNoTooltip]"
+					}
+					text_single = {
+						raw_text = "Shipping Volume: [Trade.GetQuantityOfGoodsActuallyMoved|2]"
+					}
+					text_single = {
+						raw_text = "Desired Volume: [Trade.GetDesiredGoodsShipped|2]"
+					}
+
+					text_single = {
+						visible = "[Trade.GetFromPort.IsValid]"
+						raw_text = "#G FromPort: [Trade.GetFromPort.GetNameWithNoTooltip]#!"
+					}
+					text_single = {
+						visible = "[Not(Trade.GetFromPort.IsValid)]"
+						raw_text = "#R FromPort: NONE / INVALID#!"
+					}
+
+					text_single = {
+						visible = "[Trade.GetToPort.IsValid]"
+						raw_text = "#G ToPort: [Trade.GetToPort.GetNameWithNoTooltip]#!"
+					}
+					text_single = {
+						visible = "[Not(Trade.GetToPort.IsValid)]"
+						raw_text = "#R ToPort: NONE / INVALID#!"
+					}
+
+					text_single = {
+						raw_text = "Interpretation: valid port endpoint = route has a selected trade port."
+						default_format = "#flavor"
+					}
+				}
+			}
+
+			expand = {}
+		}
+	}
+}
