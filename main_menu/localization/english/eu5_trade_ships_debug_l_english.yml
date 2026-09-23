@@ -1,0 +1,4 @@
+﻿l_english:
+ EU5TS_DEBUG_RUN_MARITIME_BRIDGE: "Run Maritime Bridge Test"
+ EU5TS_DEBUG_RUN_LAND_BRIDGE: "Run Land Bridge Test"
+ EU5TS_DEBUG_BRIDGE_TT: "Pass the selected Trade and its From/To Markets through GuiScope into a Jomini Scripted GUI effect."
